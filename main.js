@@ -67,6 +67,21 @@ const overlayLayers = {
 
 L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
 
+L.Control.geocoder({
+    defaultMarkGeocode: false
+})
+    .on('markgeocode', function (e) {
+        const bbox = e.geocode.bbox;
+        const poly = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest()
+        ]);
+        map.fitBounds(poly.getBounds());
+    })
+    .addTo(map);
+
 L.Control.LocateMe = L.Control.extend({
     onAdd: function (map) {
         const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
@@ -238,9 +253,16 @@ async function runPrediction() {
 
     const url = `${CONFIG.servers[formValues.server]}/predict/`;
 
+    const runBtn = document.getElementById('runBtn');
+    const runIcon = document.getElementById('runIcon');
+    const runText = document.getElementById('runText');
+
     try {
         showStatus('Running prediction...', 'info');
-        document.getElementById('runBtn').disabled = true;
+        runBtn.disabled = true;
+        runIcon.classList.add('animate-spin');
+        runIcon.textContent = 'sync';
+        runText.textContent = 'Processing...';
 
         const response = await fetch(url, {
             method: 'POST',
@@ -281,7 +303,10 @@ async function runPrediction() {
         console.error('Prediction error:', error);
         showStatus(`Error: ${error.message}`, 'error');
     } finally {
-        document.getElementById('runBtn').disabled = false;
+        runBtn.disabled = false;
+        runIcon.classList.remove('animate-spin');
+        runIcon.textContent = 'play_arrow';
+        runText.textContent = 'Run AI';
     }
 }
 

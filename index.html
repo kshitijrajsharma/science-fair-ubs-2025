@@ -16,6 +16,10 @@
     />
     <link
       rel="stylesheet"
+      href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css"
+    />
+    <link
+      rel="stylesheet"
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
     />
 
@@ -210,8 +214,8 @@
           disabled
           class="w-full bg-primary hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <i class="material-icons text-xl">play_arrow</i>
-          <span>Run AI</span>
+          <i id="runIcon" class="material-icons text-xl">play_arrow</i>
+          <span id="runText">Run AI</span>
         </button>
 
         <div
@@ -243,6 +247,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
     <script src="main.js"></script>
   </body>
 </html>
