@@ -33,7 +33,53 @@ const overlayLayers = {
     'IGN Orthophotos': wmtsLayer
 };
 
-L.control.layers(null, overlayLayers).addTo(map);
+L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
+
+L.Control.LocateMe = L.Control.extend({
+    onAdd: function (map) {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        container.style.backgroundColor = 'white';
+        container.style.width = '34px';
+        container.style.height = '34px';
+        container.style.cursor = 'pointer';
+        container.style.display = 'flex';
+        container.style.alignItems = 'center';
+        container.style.justifyContent = 'center';
+        container.innerHTML = '<i class="material-icons" style="font-size: 20px; color: #333;">my_location</i>';
+        container.title = 'Locate Me';
+
+        container.onclick = function () {
+            if (navigator.geolocation) {
+                container.style.opacity = '0.5';
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        map.setView([lat, lng], 16);
+                        container.style.opacity = '1';
+                    },
+                    function (error) {
+                        alert('Unable to retrieve your location: ' + error.message);
+                        container.style.opacity = '1';
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser');
+            }
+        };
+
+        return container;
+    },
+
+    onRemove: function (map) {
+    }
+});
+
+L.control.locateMe = function (opts) {
+    return new L.Control.LocateMe(opts);
+};
+
+L.control.locateMe({ position: 'topleft' }).addTo(map);
 
 const drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
