@@ -36,7 +36,7 @@ const drawControl = new L.Control.Draw({
         rectangle: {
             shapeOptions: {
                 color: '#3f51b5',
-                weight: 2,
+                weight: 4,
                 fillOpacity: 0.1
             }
         }
@@ -76,8 +76,8 @@ const CONFIG = {
     },
     models: {
         ramp: '/mnt/efsmount/fairdev/data/basemodels/ramp/baseline.tflite',
-        yolov8v1: '/mnt/efsmount/data/basemodels/yolo/yolov8s_v1-seg.onnx',
-        yolov8v2: '/mnt/efsmount/data/basemodels/yolo/yolov8s_v2-seg.onnx'
+        yolov8v1: '/mnt/efsmount/fairdev/data/basemodels/yolo/yolov8s_v1-seg.onnx',
+        yolov8v2: '/mnt/efsmount/fairdev/data/basemodels/yolo/yolov8s_v2-seg.onnx'
     }
 };
 
@@ -102,13 +102,20 @@ function getFormValues() {
 function showStatus(message, type = 'info') {
     const statusEl = document.getElementById('statusMessage');
     statusEl.textContent = message;
-    statusEl.className = `status-message ${type}`;
-    statusEl.style.display = 'block';
+    statusEl.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-blue-100', 'text-blue-800');
+
+    if (type === 'success') {
+        statusEl.classList.add('bg-green-100', 'text-green-800');
+    } else if (type === 'error') {
+        statusEl.classList.add('bg-red-100', 'text-red-800');
+    } else {
+        statusEl.classList.add('bg-blue-100', 'text-blue-800');
+    }
 }
 
 function hideStatus() {
     const statusEl = document.getElementById('statusMessage');
-    statusEl.style.display = 'none';
+    statusEl.classList.add('hidden');
 }
 
 async function runPrediction() {
