@@ -172,11 +172,11 @@ const rectangleDrawer = new L.Draw.Rectangle(map, {
     }
 });
 
-document.getElementById('drawBtn').addEventListener('click', function() {
+document.getElementById('drawBtn').addEventListener('click', function () {
     rectangleDrawer.enable();
 });
 
-document.getElementById('clearBtn').addEventListener('click', function() {
+document.getElementById('clearBtn').addEventListener('click', function () {
     drawnItems.clearLayers();
     predictionsLayer.clearLayers();
     currentBounds = null;
