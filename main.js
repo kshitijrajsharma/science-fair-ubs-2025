@@ -161,32 +161,28 @@ L.control.locateMe({ position: 'topleft' }).addTo(map);
 const drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
-const drawControl = new L.Control.Draw({
-    position: 'topright',
-    draw: {
-        polyline: false,
-        polygon: false,
-        circle: false,
-        marker: false,
-        circlemarker: false,
-        rectangle: {
-            shapeOptions: {
-                color: '#051a94ff',
-                weight: 6,
-                fillOpacity: 0.1
-            }
-        }
-    },
-    edit: {
-        featureGroup: drawnItems,
-        remove: true
+const predictionsLayer = new L.FeatureGroup();
+map.addLayer(predictionsLayer);
+
+const rectangleDrawer = new L.Draw.Rectangle(map, {
+    shapeOptions: {
+        color: '#051a94ff',
+        weight: 6,
+        fillOpacity: 0.1
     }
 });
 
-map.addControl(drawControl);
+document.getElementById('drawBtn').addEventListener('click', function() {
+    rectangleDrawer.enable();
+});
 
-const predictionsLayer = new L.FeatureGroup();
-map.addLayer(predictionsLayer);
+document.getElementById('clearBtn').addEventListener('click', function() {
+    drawnItems.clearLayers();
+    predictionsLayer.clearLayers();
+    currentBounds = null;
+    document.getElementById('runBtn').disabled = true;
+    hideStatus();
+});
 
 let currentBounds = null;
 const MAX_AREA_SQ_KM = 3;
@@ -227,12 +223,6 @@ map.on(L.Draw.Event.CREATED, function (e) {
     document.getElementById('runBtn').disabled = false;
     const t = translations[currentLanguage];
     showStatus(`${t.areaSelected} (${areaSqKm.toFixed(3)} km²). ${t.clickToRun}`, 'info');
-});
-
-map.on(L.Draw.Event.DELETED, function (e) {
-    currentBounds = null;
-    document.getElementById('runBtn').disabled = true;
-    hideStatus();
 });
 
 const CONFIG = {
@@ -388,6 +378,8 @@ const translations = {
         areaThreshold: 'Area Threshold',
         tolerance: 'Tolerance',
         orthogonalize: 'Try to make geom regular',
+        draw: 'Draw',
+        clear: 'Clear',
         runAI: 'Run AI',
         processing: 'Processing...',
         areaSelected: 'Area selected',
@@ -416,6 +408,8 @@ const translations = {
         areaThreshold: 'Seuil de surface',
         tolerance: 'Tolérance',
         orthogonalize: 'Essayer de rendre la géométrie régulière',
+        draw: 'Dessiner',
+        clear: 'Effacer',
         runAI: 'Lancer IA',
         processing: 'Traitement...',
         areaSelected: 'Zone sélectionnée',
