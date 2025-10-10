@@ -88,7 +88,7 @@ function getFormValues() {
     const area = parseFloat(document.getElementById('area').value);
     const tolerance = parseFloat(document.getElementById('tolerance').value);
     const orthogonalize = document.getElementById('orthogonalize').checked;
-    
+
     return {
         server,
         model,
@@ -116,7 +116,7 @@ async function runPrediction() {
         showStatus('Please draw a rectangle on the map first.', 'error');
         return;
     }
-    
+
     const formValues = getFormValues();
     const bbox = [
         currentBounds.getWest(),
@@ -124,7 +124,7 @@ async function runPrediction() {
         currentBounds.getEast(),
         currentBounds.getNorth()
     ];
-    
+
     const payload = {
         bbox: bbox,
         checkpoint: CONFIG.models[formValues.model],
@@ -137,13 +137,13 @@ async function runPrediction() {
         source: 'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=HR.ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/jpeg',
         zoom_level: 19
     };
-    
+
     const url = `${CONFIG.servers[formValues.server]}/predict/`;
-    
+
     try {
         showStatus('Running prediction...', 'info');
         document.getElementById('runBtn').disabled = true;
-        
+
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -151,16 +151,16 @@ async function runPrediction() {
             },
             body: JSON.stringify(payload)
         });
-        
+
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
-        
+
         const geojson = await response.json();
-        
+
         predictionsLayer.clearLayers();
-        
+
         const geoJsonLayer = L.geoJSON(geojson, {
             style: {
                 color: '#ff4081',
@@ -169,16 +169,16 @@ async function runPrediction() {
                 opacity: 1
             }
         });
-        
+
         predictionsLayer.addLayer(geoJsonLayer);
-        
+
         if (geoJsonLayer.getBounds().isValid()) {
             map.fitBounds(geoJsonLayer.getBounds());
         }
-        
+
         const featureCount = geojson.features ? geojson.features.length : 0;
         showStatus(`Success! Found ${featureCount} building(s).`, 'success');
-        
+
     } catch (error) {
         console.error('Prediction error:', error);
         showStatus(`Error: ${error.message}`, 'error');
