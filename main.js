@@ -94,7 +94,7 @@ const drawControl = new L.Control.Draw({
         circlemarker: false,
         rectangle: {
             shapeOptions: {
-                color: '#0727ddff',
+                color: '#051a94ff',
                 weight: 6,
                 fillOpacity: 0.1
             }
