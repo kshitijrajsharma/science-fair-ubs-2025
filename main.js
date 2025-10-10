@@ -216,7 +216,7 @@ map.on(L.Draw.Event.CREATED, function (e) {
 
     if (areaSqKm < MIN_AREA_SQ_KM) {
         const t = translations[currentLanguage];
-        showStatus(`Area too small (${areaSqKm.toFixed(4)} km²). Minimum allowed: ${MIN_AREA_SQ_KM} km². Please draw a larger area.`, 'error');
+        showStatus(`${t.areaTooSmall} (${areaSqKm.toFixed(4)} km²). ${t.minAllowed}: ${MIN_AREA_SQ_KM} km². ${t.drawLarger}`, 'error');
         currentBounds = null;
         document.getElementById('runBtn').disabled = true;
         return;
@@ -392,8 +392,11 @@ const translations = {
         processing: 'Processing...',
         areaSelected: 'Area selected',
         areaTooLarge: 'Area too large',
+        areaTooSmall: 'Area too small',
         maxAllowed: 'Maximum allowed',
+        minAllowed: 'Minimum allowed',
         drawSmaller: 'Please draw a smaller area',
+        drawLarger: 'Please draw a larger area',
         clickToRun: 'Click "Run AI" to proceed',
         success: 'Success! Found',
         buildings: 'building(s)',
@@ -417,8 +420,11 @@ const translations = {
         processing: 'Traitement...',
         areaSelected: 'Zone sélectionnée',
         areaTooLarge: 'Zone trop grande',
+        areaTooSmall: 'Zone trop petite',
         maxAllowed: 'Maximum autorisé',
+        minAllowed: 'Minimum autorisé',
         drawSmaller: 'Veuillez dessiner une zone plus petite',
+        drawLarger: 'Veuillez dessiner une zone plus grande',
         clickToRun: 'Cliquez sur "Lancer IA" pour continuer',
         success: 'Succès! Trouvé',
         buildings: 'bâtiment(s)',
