@@ -1,3 +1,16 @@
+document.getElementById('configToggle').addEventListener('click', function () {
+    const configSection = document.getElementById('configSection');
+    const configIcon = document.getElementById('configIcon');
+
+    if (configSection.classList.contains('hidden')) {
+        configSection.classList.remove('hidden');
+        configIcon.textContent = 'expand_less';
+    } else {
+        configSection.classList.add('hidden');
+        configIcon.textContent = 'expand_more';
+    }
+});
+
 const map = L.map('map').setView([46.603354, 1.888334], 6);
 
 const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -35,8 +48,8 @@ const drawControl = new L.Control.Draw({
         circlemarker: false,
         rectangle: {
             shapeOptions: {
-                color: '#3f51b5',
-                weight: 4,
+                color: '#0727ddff',
+                weight: 6,
                 fillOpacity: 0.1
             }
         }

@@ -18,29 +18,29 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
     />
-    
+
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3f51b5',
-                        secondary: '#ff4081',
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3f51b5",
+              secondary: "#ff4081",
+            },
+          },
+        },
+      };
     </script>
 
     <style>
       body {
         overflow: hidden;
       }
-      
+
       #map {
         z-index: 0;
       }
-      
+
       .leaflet-draw-toolbar a {
         background-color: #fff;
       }
@@ -48,80 +48,188 @@
   </head>
   <body class="flex flex-col md:flex-row h-screen overflow-hidden bg-gray-50">
     <div id="map" class="flex-1 h-1/2 md:h-full order-1"></div>
-    
-    <div id="sidebar" class="w-full md:w-96 h-1/2 md:h-full bg-white shadow-lg overflow-y-auto z-50 order-2">
+
+    <div
+      id="sidebar"
+      class="w-full md:w-96 h-1/2 md:h-full bg-white shadow-lg overflow-y-auto z-50 order-2"
+    >
       <div class="p-6">
-        <h1 class="text-3xl font-light text-primary mb-2">Building Detection</h1>
-        <p class="text-gray-600 text-sm mb-8">Draw an area on the map and run prediction</p>
-        
+        <h1 class="text-3xl font-light text-primary mb-2">
+          Find buildings with AI
+        </h1>
+        <p class="text-gray-600 text-sm mb-8">
+          Draw an area on the map and detect
+        </p>
+
         <div class="mb-6">
-          <div class="text-primary text-xs font-medium uppercase mb-3">Server</div>
-          <div class="space-y-2">
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="server" value="dev" checked class="w-4 h-4 text-primary">
-              <span class="text-gray-700">Development</span>
-            </label>
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="server" value="prod" class="w-4 h-4 text-primary">
-              <span class="text-gray-700">Production</span>
-            </label>
+          <div class="text-primary text-xs font-medium uppercase mb-3">
+            Model
           </div>
-        </div>
-        
-        <div class="mb-6">
-          <div class="text-primary text-xs font-medium uppercase mb-3">Model</div>
           <div class="space-y-2">
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="model" value="ramp" checked class="w-4 h-4 text-primary">
+              <input
+                type="radio"
+                name="model"
+                value="ramp"
+                checked
+                class="w-4 h-4 text-primary"
+              />
               <span class="text-gray-700">RAMP</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="model" value="yolov8v1" class="w-4 h-4 text-primary">
+              <input
+                type="radio"
+                name="model"
+                value="yolov8v1"
+                class="w-4 h-4 text-primary"
+              />
               <span class="text-gray-700">YOLOv8 V1</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="model" value="yolov8v2" class="w-4 h-4 text-primary">
+              <input
+                type="radio"
+                name="model"
+                value="yolov8v2"
+                class="w-4 h-4 text-primary"
+              />
               <span class="text-gray-700">YOLOv8 V2</span>
             </label>
           </div>
         </div>
-        
+
         <div class="mb-6">
-          <label class="block text-gray-700 text-sm font-medium mb-2">Confidence (%)</label>
-          <input type="number" id="confidence" value="25" min="0" max="100" 
-                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+          <button
+            id="configToggle"
+            type="button"
+            class="w-full flex items-center justify-between px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+          >
+            <span class="text-gray-700 font-medium">Configuration</span>
+            <i id="configIcon" class="material-icons text-gray-600"
+              >expand_more</i
+            >
+          </button>
+
+          <div id="configSection" class="hidden mt-4 space-y-6">
+            <div>
+              <div class="text-primary text-xs font-medium uppercase mb-3">
+                Server
+              </div>
+              <div class="space-y-2">
+                <label class="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="server"
+                    value="dev"
+                    checked
+                    class="w-4 h-4 text-primary"
+                  />
+                  <span class="text-gray-700">Development</span>
+                </label>
+                <label class="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="server"
+                    value="prod"
+                    class="w-4 h-4 text-primary"
+                  />
+                  <span class="text-gray-700">Production</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-medium mb-2"
+                >Confidence (%)</label
+              >
+              <input
+                type="number"
+                id="confidence"
+                value="25"
+                min="0"
+                max="100"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              />
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-medium mb-2"
+                >Area Threshold</label
+              >
+              <input
+                type="number"
+                id="area"
+                value="3"
+                min="0"
+                step="0.1"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              />
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-medium mb-2"
+                >Tolerance</label
+              >
+              <input
+                type="number"
+                id="tolerance"
+                value="0.3"
+                min="0"
+                max="1"
+                step="0.1"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              />
+            </div>
+
+            <div>
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="orthogonalize"
+                  checked
+                  class="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary"
+                />
+                <span class="text-gray-700">Orthogonalize</span>
+              </label>
+            </div>
+          </div>
         </div>
-        
-        <div class="mb-6">
-          <label class="block text-gray-700 text-sm font-medium mb-2">Area Threshold</label>
-          <input type="number" id="area" value="3" min="0" step="0.1" 
-                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
-        </div>
-        
-        <div class="mb-6">
-          <label class="block text-gray-700 text-sm font-medium mb-2">Tolerance</label>
-          <input type="number" id="tolerance" value="0.3" min="0" max="1" step="0.1" 
-                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
-        </div>
-        
-        <div class="mb-6">
-          <label class="flex items-center space-x-3 cursor-pointer">
-            <input type="checkbox" id="orthogonalize" checked 
-                   class="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary">
-            <span class="text-gray-700">Orthogonalize</span>
-          </label>
-        </div>
-        
-        <button id="runBtn" disabled 
-                class="w-full bg-primary hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+
+        <button
+          id="runBtn"
+          disabled
+          class="w-full bg-primary hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           <i class="material-icons text-xl">play_arrow</i>
-          <span>Run Prediction</span>
+          <span>Run Magic</span>
         </button>
-        
-        <div id="statusMessage" class="hidden mt-4 p-3 rounded-md text-sm"></div>
+
+        <div
+          id="statusMessage"
+          class="hidden mt-4 p-3 rounded-md text-sm"
+        ></div>
+
+        <div class="mt-6 pt-4 border-t border-gray-200">
+          <div class="flex items-center justify-center gap-4">
+            <img
+              src="img/cde.png"
+              alt="CDE Logo"
+              class="h-8 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+            />
+            <img
+              src="img/eu.jpg"
+              alt="EU Logo"
+              class="h-8 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+            />
+            <img
+              src="img/ubs.png"
+              alt="UBS Logo"
+              class="h-8 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+            />
+          </div>
+        </div>
       </div>
     </div>
-    
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
     <script src="main.js"></script>
