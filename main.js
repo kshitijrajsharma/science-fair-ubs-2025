@@ -61,12 +61,41 @@ osmLayer.addTo(map);
 tileGridLayer.addTo(map);
 
 const overlayLayers = {
-    'OpenStreetMap': osmLayer,
-    'IGN Orthophotos': wmtsLayer,
-    'Tile Matrix Grid': tileGridLayer
+    'layerOSM': { layer: osmLayer, active: true },
+    'layerIGN': { layer: wmtsLayer, active: false },
+    'layerGrid': { layer: tileGridLayer, active: true }
 };
 
-L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
+function initCustomLayerSwitcher() {
+    const container = document.getElementById('customLayerSwitcher');
+    container.innerHTML = '';
+    
+    Object.keys(overlayLayers).forEach(translationKey => {
+        const layerInfo = overlayLayers[translationKey];
+        const label = document.createElement('label');
+        label.className = 'flex items-center space-x-3 cursor-pointer text-gray-700';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = map.hasLayer(layerInfo.layer);
+        checkbox.className = 'w-4 h-4 text-primary';
+        
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(layerInfo.layer);
+            } else {
+                map.removeLayer(layerInfo.layer);
+            }
+        });
+        
+        const span = document.createElement('span');
+        span.textContent = translations[currentLanguage][translationKey];
+        
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        container.appendChild(label);
+    });
+}
 
 L.Control.geocoder({
     defaultMarkGeocode: false
@@ -348,6 +377,10 @@ const translations = {
     en: {
         title: 'Find buildings with AI',
         subtitle: 'Draw an area on the map and run',
+        mapLayers: 'Map Layers',
+        layerOSM: 'OpenStreetMap',
+        layerIGN: 'IGN Orthophotos',
+        layerGrid: 'Tile Matrix Grid',
         model: 'Model',
         configuration: 'Configuration',
         server: 'Server',
@@ -369,6 +402,10 @@ const translations = {
     fr: {
         title: 'Trouver des bâtiments avec IA',
         subtitle: 'Dessinez une zone sur la carte et lancez',
+        mapLayers: 'Couches de carte',
+        layerOSM: 'OpenStreetMap',
+        layerIGN: 'Orthophotos IGN',
+        layerGrid: 'Grille matricielle',
         model: 'Modèle',
         configuration: 'Configuration',
         server: 'Serveur',
@@ -401,6 +438,7 @@ function setLanguage(lang) {
     });
     document.getElementById('currentLang').textContent = lang.toUpperCase();
     localStorage.setItem('language', lang);
+    initCustomLayerSwitcher();
 }
 
 document.getElementById('langToggle').addEventListener('click', () => {
