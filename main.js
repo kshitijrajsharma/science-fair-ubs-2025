@@ -159,14 +159,34 @@ const predictionsLayer = new L.FeatureGroup();
 map.addLayer(predictionsLayer);
 
 let currentBounds = null;
+const MAX_AREA_SQ_KM = 3;
+
+function calculateAreaSqKm(bounds) {
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
+    const width = ne.distanceTo(L.latLng(ne.lat, sw.lng));
+    const height = ne.distanceTo(L.latLng(sw.lat, ne.lng));
+    return (width * height) / 1000000;
+}
 
 map.on(L.Draw.Event.CREATED, function (e) {
     const layer = e.layer;
+    const bounds = layer.getBounds();
+    const areaSqKm = calculateAreaSqKm(bounds);
+
     drawnItems.clearLayers();
+
+    if (areaSqKm > MAX_AREA_SQ_KM) {
+        showStatus(`Area too large (${areaSqKm.toFixed(2)} km²). Maximum allowed: ${MAX_AREA_SQ_KM} km². Please draw a smaller area.`, 'error');
+        currentBounds = null;
+        document.getElementById('runBtn').disabled = true;
+        return;
+    }
+
     drawnItems.addLayer(layer);
-    currentBounds = layer.getBounds();
+    currentBounds = bounds;
     document.getElementById('runBtn').disabled = false;
-    showStatus('Area selected. Click "Run Prediction" to proceed.', 'info');
+    showStatus(`Area selected (${areaSqKm.toFixed(3)} km²). Click "Run AI" to proceed.`, 'info');
 });
 
 map.on(L.Draw.Event.DELETED, function (e) {
