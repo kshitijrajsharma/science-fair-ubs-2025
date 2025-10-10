@@ -22,11 +22,43 @@ const wmtsLayer = L.tileLayer(
     'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=HR.ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/jpeg',
     {
         attribution: '© IGN France',
-        maxZoom: 20
+        maxZoom: 20,
+        className: 'wmts-layer'
     }
 );
 
+L.GridLayer.TileGrid = L.GridLayer.extend({
+    createTile: function (coords) {
+        const tile = document.createElement('canvas');
+        const tileSize = this.getTileSize();
+        tile.width = tileSize.x;
+        tile.height = tileSize.y;
+
+        const ctx = tile.getContext('2d');
+        ctx.strokeStyle = '#f2f7f2ff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, tileSize.x, tileSize.y);
+
+        ctx.fillStyle = '#f7f9f7ff';
+        ctx.font = 'bold 14px Arial';
+        const text = `${coords.z}/${coords.x}/${coords.y}`;
+        ctx.fillText(text, 10, 20);
+
+        return tile;
+    }
+});
+
+L.gridLayer.tileGrid = function (opts) {
+    return new L.GridLayer.TileGrid(opts);
+};
+
+const tileGridLayer = L.gridLayer.tileGrid({
+    pane: 'overlayPane',
+    opacity: 0.8
+});
+
 osmLayer.addTo(map);
+tileGridLayer.addTo(map);
 
 const overlayLayers = {
     'OpenStreetMap': osmLayer,
