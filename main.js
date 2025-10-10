@@ -22,7 +22,7 @@ const wmtsLayer = L.tileLayer(
     'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=HR.ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/jpeg',
     {
         attribution: '© IGN France',
-        maxZoom: 20,
+        maxZoom: 19,
         className: 'wmts-layer'
     }
 );
