@@ -11,7 +11,7 @@ document.getElementById('configToggle').addEventListener('click', function () {
     }
 });
 
-const map = L.map('map').setView([47.65837, -2.75993], 10);
+const map = L.map('map').setView([47.65837, -2.75993], 12);
 
 const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
