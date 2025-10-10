@@ -62,7 +62,8 @@ tileGridLayer.addTo(map);
 
 const overlayLayers = {
     'OpenStreetMap': osmLayer,
-    'IGN Orthophotos': wmtsLayer
+    'IGN Orthophotos': wmtsLayer,
+    'Tile Matrix Grid': tileGridLayer
 };
 
 L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
