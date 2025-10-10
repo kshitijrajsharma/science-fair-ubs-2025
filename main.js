@@ -161,7 +161,7 @@ map.addLayer(predictionsLayer);
 
 let currentBounds = null;
 const MAX_AREA_SQ_KM = 3;
-
+const MIN_AREA_SQ_KM = 0.001;
 function calculateAreaSqKm(bounds) {
     const ne = bounds.getNorthEast();
     const sw = bounds.getSouthWest();
@@ -180,6 +180,14 @@ map.on(L.Draw.Event.CREATED, function (e) {
     if (areaSqKm > MAX_AREA_SQ_KM) {
         const t = translations[currentLanguage];
         showStatus(`${t.areaTooLarge} (${areaSqKm.toFixed(2)} km²). ${t.maxAllowed}: ${MAX_AREA_SQ_KM} km². ${t.drawSmaller}`, 'error');
+        currentBounds = null;
+        document.getElementById('runBtn').disabled = true;
+        return;
+    }
+
+    if (areaSqKm < MIN_AREA_SQ_KM) {
+        const t = translations[currentLanguage];
+        showStatus(`Area too small (${areaSqKm.toFixed(4)} km²). Minimum allowed: ${MIN_AREA_SQ_KM} km². Please draw a larger area.`, 'error');
         currentBounds = null;
         document.getElementById('runBtn').disabled = true;
         return;
@@ -211,7 +219,7 @@ const CONFIG = {
 };
 
 function getFormValues() {
-    const server = document.querySelector('input[name="server"]:checked').value;
+    const server = 'dev';
     const model = document.querySelector('input[name="model"]:checked').value;
     const confidence = parseFloat(document.getElementById('confidence').value);
     const area = parseFloat(document.getElementById('area').value);
