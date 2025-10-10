@@ -177,7 +177,8 @@ map.on(L.Draw.Event.CREATED, function (e) {
     drawnItems.clearLayers();
 
     if (areaSqKm > MAX_AREA_SQ_KM) {
-        showStatus(`Area too large (${areaSqKm.toFixed(2)} km²). Maximum allowed: ${MAX_AREA_SQ_KM} km². Please draw a smaller area.`, 'error');
+        const t = translations[currentLanguage];
+        showStatus(`${t.areaTooLarge} (${areaSqKm.toFixed(2)} km²). ${t.maxAllowed}: ${MAX_AREA_SQ_KM} km². ${t.drawSmaller}`, 'error');
         currentBounds = null;
         document.getElementById('runBtn').disabled = true;
         return;
@@ -186,7 +187,8 @@ map.on(L.Draw.Event.CREATED, function (e) {
     drawnItems.addLayer(layer);
     currentBounds = bounds;
     document.getElementById('runBtn').disabled = false;
-    showStatus(`Area selected (${areaSqKm.toFixed(3)} km²). Click "Run AI" to proceed.`, 'info');
+    const t = translations[currentLanguage];
+    showStatus(`${t.areaSelected} (${areaSqKm.toFixed(3)} km²). ${t.clickToRun}`, 'info');
 });
 
 map.on(L.Draw.Event.DELETED, function (e) {
@@ -276,13 +278,14 @@ async function runPrediction() {
     const runBtn = document.getElementById('runBtn');
     const runIcon = document.getElementById('runIcon');
     const runText = document.getElementById('runText');
+    const t = translations[currentLanguage];
 
     try {
-        showStatus('Running prediction...', 'info');
+        showStatus(`${t.processing}`, 'info');
         runBtn.disabled = true;
         runIcon.classList.add('animate-spin');
         runIcon.textContent = 'sync';
-        runText.textContent = 'Processing...';
+        runText.textContent = t.processing;
 
         const response = await fetch(url, {
             method: 'POST',
@@ -317,20 +320,87 @@ async function runPrediction() {
         }
 
         const featureCount = geojson.features ? geojson.features.length : 0;
-        showStatus(`Success! Found ${featureCount} building(s).`, 'success');
+        showStatus(`${t.success} ${featureCount} ${t.buildings}`, 'success');
 
     } catch (error) {
         console.error('Prediction error:', error);
-        showStatus(`Error: ${error.message}`, 'error');
+        showStatus(`${t.error}: ${error.message}`, 'error');
     } finally {
         runBtn.disabled = false;
         runIcon.classList.remove('animate-spin');
         runIcon.textContent = 'play_arrow';
-        runText.textContent = 'Run AI';
+        runText.textContent = t.runAI;
     }
 }
 
 document.getElementById('runBtn').addEventListener('click', runPrediction);
+
+const translations = {
+    en: {
+        title: 'Find buildings with AI',
+        subtitle: 'Draw an area on the map and run',
+        model: 'Model',
+        configuration: 'Configuration',
+        server: 'Server',
+        confidence: 'Confidence (%)',
+        areaThreshold: 'Area Threshold',
+        tolerance: 'Tolerance',
+        orthogonalize: 'Try to make geom regular',
+        runAI: 'Run AI',
+        processing: 'Processing...',
+        areaSelected: 'Area selected',
+        areaTooLarge: 'Area too large',
+        maxAllowed: 'Maximum allowed',
+        drawSmaller: 'Please draw a smaller area',
+        clickToRun: 'Click "Run AI" to proceed',
+        success: 'Success! Found',
+        buildings: 'building(s)',
+        error: 'Error'
+    },
+    fr: {
+        title: 'Trouver des bâtiments avec IA',
+        subtitle: 'Dessinez une zone sur la carte et lancez',
+        model: 'Modèle',
+        configuration: 'Configuration',
+        server: 'Serveur',
+        confidence: 'Confiance (%)',
+        areaThreshold: 'Seuil de surface',
+        tolerance: 'Tolérance',
+        orthogonalize: 'Essayer de rendre la géométrie régulière',
+        runAI: 'Lancer IA',
+        processing: 'Traitement...',
+        areaSelected: 'Zone sélectionnée',
+        areaTooLarge: 'Zone trop grande',
+        maxAllowed: 'Maximum autorisé',
+        drawSmaller: 'Veuillez dessiner une zone plus petite',
+        clickToRun: 'Cliquez sur "Lancer IA" pour continuer',
+        success: 'Succès! Trouvé',
+        buildings: 'bâtiment(s)',
+        error: 'Erreur'
+    }
+};
+
+let currentLanguage = 'en';
+
+function setLanguage(lang) {
+    currentLanguage = lang;
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+            element.textContent = translations[lang][key];
+        }
+    });
+    document.getElementById('currentLang').textContent = lang.toUpperCase();
+    localStorage.setItem('language', lang);
+}
+
+document.getElementById('langToggle').addEventListener('click', () => {
+    const newLang = currentLanguage === 'en' ? 'fr' : 'en';
+    setLanguage(newLang);
+});
+
+const savedLang = localStorage.getItem('language') || 'en';
+setLanguage(savedLang);
 
 if (typeof componentHandler !== 'undefined') {
     componentHandler.upgradeDom();
